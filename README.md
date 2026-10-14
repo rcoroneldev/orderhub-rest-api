@@ -3,7 +3,155 @@
 RESTful order management API built with **FastAPI**: products, customers and orders.
 Construida paso a paso, desde "Hola mundo" hasta una arquitectura en capas lista para crecer.
 
-La arquitectura y las decisiones de diseño están en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
+## Diseño arquitectónico
+
+### Vista general: arquitectura en capas
+
+Cada petición atraviesa las capas siempre en la misma dirección, de arriba hacia abajo.
+Cada capa tiene un solo trabajo.
+
+```mermaid
+flowchart TB
+    client["Cliente<br/>Swagger UI, Postman, frontend"]
+
+    subgraph api["OrderHub API (FastAPI)"]
+        direction TB
+        router["Routers<br/>HTTP, validación con Pydantic, códigos de estado"]
+        service["Services<br/>reglas de negocio"]
+        repo["Repositories<br/>acceso a datos con SQLAlchemy"]
+        shared["core y common<br/>configuración, errores RFC 7807, paginación"]
+        router --> service --> repo
+        router -.-> shared
+        service -.-> shared
+    end
+
+    db[("Base de datos<br/>SQLite, PostgreSQL en la etapa 6")]
+
+    client -->|"HTTP + JSON en /api/v1"| router
+    repo --> db
+```
+
+| Capa | Responsabilidad | Lo que NO hace |
+|---|---|---|
+| **Router** | Recibir la petición, validar la entrada, devolver el código HTTP correcto | Decidir reglas de negocio o escribir SQL |
+| **Service** | Aplicar las reglas: SKU único, stock suficiente, transiciones de estado | Conocer HTTP (lanza errores de dominio, no `HTTPException`) |
+| **Repository** | Leer y escribir en la base de datos | Decidir si una operación está permitida |
+| **core / common** | Configuración, formato de errores, paginación compartida | — |
+
+### Flujo de una petición: crear un producto
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor C as Cliente
+    participant R as Router
+    participant S as ProductService
+    participant P as ProductRepository
+    participant DB as Base de datos
+
+    C->>R: POST /api/v1/products (JSON)
+    R->>R: Valida el cuerpo con ProductCreate
+    alt Datos inválidos
+        R-->>C: 400 con la lista de errores por campo
+    else Datos válidos
+        R->>S: create(data)
+        S->>P: get_by_sku(sku)
+        P->>DB: SELECT por sku
+        alt El SKU ya existe
+            S-->>R: Error de dominio Conflict
+            R-->>C: 409 Conflict (RFC 7807)
+        else SKU nuevo
+            S->>P: add(product)
+            P->>DB: INSERT y COMMIT
+            S-->>R: Producto creado
+            R-->>C: 201 Created + cabecera Location
+        end
+    end
+```
+
+### Modelo de datos
+
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : realiza
+    ORDER ||--|{ ORDER_ITEM : contiene
+    PRODUCT ||--o{ ORDER_ITEM : aparece_en
+
+    PRODUCT {
+        int id PK
+        string sku UK
+        string name
+        string description
+        decimal price
+        int stock
+        bool is_active
+        datetime created_at
+        datetime updated_at
+    }
+    CUSTOMER {
+        int id PK
+        string email UK
+        string full_name
+        datetime created_at
+    }
+    ORDER {
+        int id PK
+        int customer_id FK
+        string status
+        decimal total
+        datetime created_at
+    }
+    ORDER_ITEM {
+        int id PK
+        int order_id FK
+        int product_id FK
+        int quantity
+        decimal unit_price
+    }
+```
+
+- **Implementado:** `PRODUCT`. **Etapa 4:** `CUSTOMER`, `ORDER` y `ORDER_ITEM`.
+- `ORDER_ITEM.unit_price` copia el precio al momento de la compra: si el producto cambia de
+  precio, los pedidos antiguos no cambian.
+- El dinero usa `Decimal` / `Numeric(10, 2)`, nunca `float`.
+
+### Ciclo de vida de un pedido (etapa 4)
+
+```mermaid
+stateDiagram-v2
+    [*] --> pending: POST /orders
+    pending --> paid: pay
+    paid --> shipped: ship
+    shipped --> delivered: deliver
+    pending --> cancelled: cancel
+    paid --> cancelled: cancel y devuelve el stock
+    delivered --> [*]
+    cancelled --> [*]
+```
+
+Cualquier transición que no aparece en el diagrama responde `409 Conflict`.
+
+### Estructura del código
+
+```
+app/
+├── main.py                    # create_app(): registra routers y manejadores de errores
+├── core/
+│   ├── config.py              # configuración por variables de entorno (ORDERHUB_*)
+│   └── errors.py              # errores de dominio → respuestas RFC 7807
+├── db/session.py              # conexión, sesión y dependencia get_db
+├── common/pagination.py       # Page[T], PageParams, ordenamiento con lista blanca
+└── modules/
+    └── products/
+        ├── router.py          # capa HTTP
+        ├── service.py         # reglas de negocio
+        ├── repository.py      # acceso a datos
+        ├── schemas.py         # contrato de la API (Pydantic)
+        └── models.py          # tabla (SQLAlchemy)
+```
+
+Las decisiones de diseño (ADRs) y las convenciones de la API están en
+[`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
 
 ## Cómo está organizado este repositorio
 
