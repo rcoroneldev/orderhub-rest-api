@@ -1,0 +1,14 @@
+$kind: http-request
+name: "RETO: precio de un producto"
+description: Reto de la lección 2. FALLA (404) hasta que añadas la ruta GET /products/{product_id}/precio en l02_parametros_ruta.py. Cuando la implementes, esta petición pasará sus pruebas.
+url: "{{base_url}}/products/:product_id/precio"
+method: GET
+pathVariables:
+  product_id: "1"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200 - implementa el reto para que pase", () => pm.response.to.have.status(200));
+      pm.test("Devuelve el precio", () => pm.expect(pm.response.json()).to.have.property("precio"));
+    language: text/javascript
+order: 7000

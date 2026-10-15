@@ -1,0 +1,29 @@
+$kind: http-request
+url: "{{base_url}}/api/v1/products"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "sku": "{{sku}}",
+      "name": "Polo básico",
+      "price": "39.90",
+      "stock": 50
+    }
+scripts:
+  - type: beforeRequest
+    code: |-
+      // SKU único en cada ejecución, para poder repetir la carpeta sin chocar con un 409
+      pm.collectionVariables.set("sku", "POLO-" + Date.now());
+    language: text/javascript
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 201", () => pm.response.to.have.status(201));
+      const body = pm.response.json();
+      pm.collectionVariables.set("product_id", body.id);
+      pm.test("Devuelve la cabecera Location", () => pm.response.to.have.header("Location"));
+      pm.test("El precio viaja como texto exacto", () => pm.expect(body.price).to.eql("39.90"));
+    language: text/javascript
+order: 1000

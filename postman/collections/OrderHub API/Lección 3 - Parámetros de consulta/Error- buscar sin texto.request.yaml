@@ -1,0 +1,9 @@
+$kind: http-request
+name: "Error: buscar sin texto"
+url: "{{base_url}}/buscar"
+method: GET
+scripts:
+  - type: afterResponse
+    code: pm.test("Responde 422 - 'texto' es obligatorio", () => pm.response.to.have.status(422));
+    language: text/javascript
+order: 7000

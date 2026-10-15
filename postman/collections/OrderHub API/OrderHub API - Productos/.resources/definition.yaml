@@ -1,0 +1,8 @@
+$kind: collection
+description: |-
+  Ejecuta antes, desde la raíz del repositorio:
+
+      uvicorn app.main:app --reload
+
+  Ejecuta las peticiones EN ORDEN (o toda la carpeta con Run). "Crear producto" guarda el id en la variable {{product_id}}, que usan las siguientes.
+order: 4000

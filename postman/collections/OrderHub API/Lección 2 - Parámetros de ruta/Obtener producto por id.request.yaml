@@ -1,0 +1,17 @@
+$kind: http-request
+description: Prueba con 1, 2 y 3. FastAPI convierte el texto "1" de la URL al entero 1.
+url: "{{base_url}}/products/:product_id"
+method: GET
+pathVariables:
+  product_id: "1"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", () => pm.response.to.have.status(200));
+      const body = pm.response.json();
+      // Postman ya sustituyó :product_id en la ruta: /products/1 -> path = ["products", "1"]
+      const pedido = Number(pm.request.url.variables.get("product_id") || pm.request.url.path[1]);
+      pm.test("Devuelve el producto pedido", () => pm.expect(body.id).to.eql(pedido));
+      pm.test("El id llega como número, no como texto", () => pm.expect(body.id).to.be.a("number"));
+    language: text/javascript
+order: 1000

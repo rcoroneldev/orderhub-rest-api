@@ -1,0 +1,19 @@
+$kind: http-request
+url: "{{base_url}}/api/v1/products?search=polo&in_stock=true&min_price=10&max_price=120&sort=-price&page=1&size=10"
+method: GET
+queryParams:
+  search: polo
+  in_stock: "true"
+  min_price: "10"
+  max_price: "120"
+  sort: -price
+  page: "1"
+  size: "10"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", () => pm.response.to.have.status(200));
+      const body = pm.response.json();
+      pm.test("Respuesta paginada", () => pm.expect(body).to.have.keys("items", "total", "page", "size", "pages"));
+    language: text/javascript
+order: 5000

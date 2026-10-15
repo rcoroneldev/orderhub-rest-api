@@ -1,0 +1,17 @@
+$kind: http-request
+description: "La misma búsqueda sin saltar resultados: ahora sí aparece el producto."
+url: "{{base_url}}/products?categoria=ropa&con_stock=true&precio_max=120&saltar=0&limite=10"
+method: GET
+queryParams:
+  categoria: ropa
+  con_stock: "true"
+  precio_max: "120"
+  saltar: "0"
+  limite: "10"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", () => pm.response.to.have.status(200));
+      pm.test("Aparece 1 producto", () => pm.expect(pm.response.json().items).to.have.lengthOf(1));
+    language: text/javascript
+order: 4000

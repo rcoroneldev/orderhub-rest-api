@@ -1,0 +1,12 @@
+$kind: http-request
+description: "95 supera el máximo de 90: Path(le=90) debe rechazarlo."
+url: "{{base_url}}/products/:product_id/descuento/:porcentaje"
+method: GET
+pathVariables:
+  product_id: "1"
+  porcentaje: "95"
+scripts:
+  - type: afterResponse
+    code: pm.test("Responde 422 - Path(le=90) rechaza 95", () => pm.response.to.have.status(422));
+    language: text/javascript
+order: 9000

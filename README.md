@@ -1,7 +1,6 @@
 # OrderHub API
 
 RESTful order management API built with **FastAPI**: products, customers and orders.
-Construida paso a paso, desde "Hola mundo" hasta una arquitectura en capas lista para crecer.
 
 ## Diseño arquitectónico
 

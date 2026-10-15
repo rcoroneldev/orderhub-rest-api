@@ -1,0 +1,24 @@
+$kind: http-request
+name: "3. Error: datos inválidos"
+url: "{{base_url}}/api/v1/products"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "sku": "mal sku",
+      "name": "X",
+      "price": "-1"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 400", () => pm.response.to.have.status(400));
+      pm.test("Lista los campos con error", () => {
+        const fields = pm.response.json().errors.map(e => e.field);
+        pm.expect(fields).to.include.members(["sku", "price"]);
+      });
+    language: text/javascript
+order: 3000

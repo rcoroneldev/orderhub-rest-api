@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{base_url}}/products?categoria=ropa"
+method: GET
+queryParams:
+  categoria: ropa
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", () => pm.response.to.have.status(200));
+      pm.test("Solo ropa", () => pm.response.json().items.forEach(p => pm.expect(p.categoria).to.eql("ropa")));
+    language: text/javascript
+order: 2000

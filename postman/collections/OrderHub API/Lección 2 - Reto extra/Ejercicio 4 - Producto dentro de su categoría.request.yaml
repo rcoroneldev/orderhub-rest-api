@@ -1,0 +1,16 @@
+$kind: http-request
+description: |-
+  Crea GET /categorias/{categoria}/products/{product_id}: DOS parámetros de ruta en la misma URL.
+  Devuelve el producto solo si existe Y pertenece a esa categoría; si no, {"error": ...}.
+url: "{{base_url}}/categorias/:categoria/products/:product_id"
+method: GET
+pathVariables:
+  categoria: ropa
+  product_id: "1"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", () => pm.response.to.have.status(200));
+      pm.test("Devuelve el producto 1", () => pm.expect(pm.response.json().id).to.eql(1));
+    language: text/javascript
+order: 6000

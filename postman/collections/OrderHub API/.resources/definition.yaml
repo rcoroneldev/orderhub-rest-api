@@ -1,0 +1,9 @@
+$kind: collection
+description: |-
+  Colección de práctica para el repositorio orderhub-rest-api.
+
+  Variables de la colección: base_url (por defecto http://localhost:8000), product_id y sku (se rellenan solas al ejecutar "1. Crear producto").
+variables:
+  base_url: http://localhost:8000
+  product_id: ""
+  sku: ""

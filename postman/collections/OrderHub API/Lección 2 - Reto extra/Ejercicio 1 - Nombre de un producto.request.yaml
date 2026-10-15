@@ -1,0 +1,17 @@
+$kind: http-request
+description: |-
+  Crea GET /products/{product_id}/nombre que devuelva {"nombre": ...}.
+  Si el producto no existe, devuelve {"error": ...} (igual que obtener_producto).
+url: "{{base_url}}/products/:product_id/nombre"
+method: GET
+pathVariables:
+  - key: product_id
+    value: "1"
+    description: ""
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", () => pm.response.to.have.status(200));
+      pm.test("Devuelve el nombre del producto 3", () => pm.expect(pm.response.json().nombre).to.eql("Taza térmica"));
+    language: text/javascript
+order: 1000

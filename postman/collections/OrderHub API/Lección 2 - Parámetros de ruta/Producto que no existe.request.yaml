@@ -1,0 +1,13 @@
+$kind: http-request
+description: "Responde 200 con un mensaje de error. Es incorrecto a propósito: en la lección 6 aprenderás a devolver 404 Not Found."
+url: "{{base_url}}/products/:product_id"
+method: GET
+pathVariables:
+  product_id: "99"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200 - por ahora; en la lección 6 será 404", () => pm.response.to.have.status(200));
+      pm.test("Trae un mensaje de error", () => pm.expect(pm.response.json()).to.have.property("error"));
+    language: text/javascript
+order: 2000

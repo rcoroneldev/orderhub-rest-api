@@ -1,0 +1,15 @@
+$kind: http-request
+description: |-
+  Crea GET /products/mas-caro que devuelva el producto de mayor precio.
+  Cuidado con el ORDEN de las rutas: si la declaras en el lugar equivocado, responderá 422. Pista: max(..., key=...).
+url: "{{base_url}}/products/mas-caro"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200 - si sale 422, revisa el orden de las rutas", () => pm.response.to.have.status(200));
+      const body = pm.response.json();
+      pm.test("Es el producto 2 (Audífonos)", () => pm.expect(body.id).to.eql(2));
+      pm.test("Su precio es 129", () => pm.expect(body.precio).to.eql(129));
+    language: text/javascript
+order: 5000

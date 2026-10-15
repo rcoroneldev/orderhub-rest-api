@@ -4,6 +4,9 @@ LECCIÓN 3: Parámetros de consulta (query parameters)
 
 Conceptos:
 - Van después del "?" en la URL:  /products?categoria=ropa&limite=2
+- Examples
+- /products?categoria=sports&con_stock=true&precio_max=50&limite=4
+- /products?categoria=electronica&precio=150&limite=5
 - Sirven para FILTRAR, BUSCAR, ORDENAR y PAGINAR, no para identificar un recurso.
   (Para identificar uno: ruta, /products/1. Para filtrar varios: query.)
 - Cualquier argumento de la función que NO esté en la ruta es un query parameter.
@@ -23,6 +26,8 @@ Probar:
     /buscar                                 -> 422: 'texto' es obligatorio
     /buscar?texto=polo
 """
+from typing import Optional
+
 from fastapi import FastAPI, Query
 
 app = FastAPI(title="OrderHub - Lección 3: parámetros de consulta")
@@ -38,9 +43,9 @@ PRODUCTS = [
 
 @app.get("/products")
 def listar_productos(
-    categoria: str | None = None,           # opcional: None significa "no filtrar"
-    con_stock: bool | None = None,          # opcional, se convierte de texto a bool
-    precio_max: float | None = Query(None, gt=0),
+    categoria: Optional[str] = None,        # opcional: None significa "no filtrar"
+    con_stock: Optional[bool] = None,       # opcional, se convierte de texto a bool
+    precio_max: Optional[float] = Query(None, gt=0),
     saltar: int = Query(0, ge=0),           # ge = "mayor o igual que"
     limite: int = Query(10, ge=1, le=100, description="Máximo de resultados"),
 ):
@@ -58,8 +63,8 @@ def listar_productos(
 
 
 @app.get("/buscar")
-def buscar(texto: str = Query(min_length=2)):  # sin valor por defecto = OBLIGATORIO
-    return [p for p in PRODUCTS if texto.lower() in p["nombre"].lower()]
+def buscar(NombreProducto: str = Query(min_length=2)):  # sin valor por defecto = OBLIGATORIO
+    return [p for p in PRODUCTS if NombreProducto.lower() in p["nombre"].lower()]
 
 
 # RETO: añade a /products un parámetro "orden" que acepte "precio" o "-precio"

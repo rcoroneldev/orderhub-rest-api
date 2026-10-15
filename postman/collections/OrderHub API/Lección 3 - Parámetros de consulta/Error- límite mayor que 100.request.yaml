@@ -1,0 +1,11 @@
+$kind: http-request
+name: "Error: límite mayor que 100"
+url: "{{base_url}}/products?limite=500"
+method: GET
+queryParams:
+  limite: "500"
+scripts:
+  - type: afterResponse
+    code: pm.test("Responde 422 - FastAPI valida el máximo", () => pm.response.to.have.status(422));
+    language: text/javascript
+order: 5000

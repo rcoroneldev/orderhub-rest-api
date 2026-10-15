@@ -1,0 +1,14 @@
+$kind: http-request
+name: "Error: categoría no permitida"
+description: "'juguetes' no está en el Enum Categoria: FastAPI responde 422 y lista los valores válidos."
+url: "{{base_url}}/categorias/:categoria"
+method: GET
+pathVariables:
+  categoria: juguetes
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 422 - valor fuera del Enum", () => pm.response.to.have.status(422));
+      console.log("Mensaje de FastAPI:", pm.response.json().detail[0].msg);
+    language: text/javascript
+order: 6000

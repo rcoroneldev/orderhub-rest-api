@@ -1,0 +1,8 @@
+$kind: collection
+description: |-
+  Ejecuta antes, desde la carpeta lecciones/:
+
+      uvicorn l02_parametros_ruta:app --reload
+
+  Las peticiones usan VARIABLES DE RUTA de Postman: en la URL aparecen como :product_id o :categoria, y su valor se edita en la pestaña Params, tabla "Path Variables". Cambia el valor y pulsa Send para probar otros casos sin tocar la URL.
+order: 1000

@@ -1,0 +1,16 @@
+$kind: http-request
+name: "Error: id que no es un número"
+description: "FastAPI valida el tipo int automáticamente y responde 422. Lee el cuerpo: explica qué campo falló y por qué."
+url: "{{base_url}}/products/:product_id"
+method: GET
+pathVariables:
+  product_id: abc
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 422 - 'abc' no es un entero", () => pm.response.to.have.status(422));
+      const detail = pm.response.json().detail[0];
+      pm.test("Señala el parámetro product_id", () => pm.expect(detail.loc).to.include("product_id"));
+      console.log("Mensaje de FastAPI:", detail.msg);
+    language: text/javascript
+order: 3000

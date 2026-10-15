@@ -1,0 +1,10 @@
+$kind: http-request
+url: "{{base_url}}/categorias/:categoria/total"
+method: GET
+pathVariables:
+  categoria: juguetes
+scripts:
+  - type: afterResponse
+    code: pm.test("Responde 422 - el Enum rechaza 'juguetes'", () => pm.response.to.have.status(422));
+    language: text/javascript
+order: 4000

@@ -1,0 +1,20 @@
+$kind: http-request
+url: "{{base_url}}/api/v1/products/{{product_id}}"
+method: PATCH
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "price": "35.00"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", () => pm.response.to.have.status(200));
+      const body = pm.response.json();
+      pm.test("Cambió el precio", () => pm.expect(body.price).to.eql("35.00"));
+      pm.test("El stock no se perdió", () => pm.expect(body.stock).to.eql(50));
+    language: text/javascript
+order: 6000

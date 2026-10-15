@@ -1,0 +1,17 @@
+$kind: http-request
+description: |-
+  Crea GET /categorias/{categoria}/total que devuelva {"categoria": ..., "cantidad": N}.
+  Usa el Enum Categoria que ya existe, para que FastAPI rechace categorías inválidas.
+url: "{{base_url}}/categorias/:categoria/total"
+method: GET
+pathVariables:
+  categoria: electronica
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", () => pm.response.to.have.status(200));
+      const body = pm.response.json();
+      pm.test("Indica la categoría", () => pm.expect(body.categoria).to.eql("electronica"));
+      pm.test("Cuenta 1 producto de electrónica", () => pm.expect(body.cantidad).to.eql(1));
+    language: text/javascript
+order: 3000

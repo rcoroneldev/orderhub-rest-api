@@ -1,0 +1,12 @@
+$kind: http-request
+name: "Ruta fija: producto destacado"
+description: Funciona porque /products/destacado está declarada ANTES que /products/{product_id}. Si inviertes el orden en el código, esta petición devolverá 422.
+url: "{{base_url}}/products/destacado"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", () => pm.response.to.have.status(200));
+      pm.test("Devuelve el producto destacado (id 2)", () => pm.expect(pm.response.json().id).to.eql(2));
+    language: text/javascript
+order: 4000

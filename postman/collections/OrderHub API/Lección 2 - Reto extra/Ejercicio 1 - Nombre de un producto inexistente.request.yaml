@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{base_url}}/products/:product_id/nombre"
+method: GET
+pathVariables:
+  product_id: "99"
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", () => pm.response.to.have.status(200));
+      pm.test("Devuelve un mensaje de error", () => pm.expect(pm.response.json()).to.have.property("error"));
+    language: text/javascript
+order: 2000

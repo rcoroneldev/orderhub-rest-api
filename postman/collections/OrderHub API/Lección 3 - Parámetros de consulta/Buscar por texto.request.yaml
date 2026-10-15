@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{base_url}}/buscar?texto=polo"
+method: GET
+queryParams:
+  texto: polo
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Responde 200", () => pm.response.to.have.status(200));
+      pm.test("Encuentra 2 polos", () => pm.expect(pm.response.json()).to.have.lengthOf(2));
+    language: text/javascript
+order: 6000

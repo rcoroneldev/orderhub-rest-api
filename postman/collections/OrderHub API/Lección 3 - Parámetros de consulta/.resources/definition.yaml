@@ -1,0 +1,8 @@
+$kind: collection
+description: |-
+  Ejecuta antes, desde la carpeta lecciones/:
+
+      uvicorn l03_parametros_query:app --reload
+
+  Activa o desactiva parámetros con las casillas de la pestaña Params y observa cómo cambia la respuesta.
+order: 3000

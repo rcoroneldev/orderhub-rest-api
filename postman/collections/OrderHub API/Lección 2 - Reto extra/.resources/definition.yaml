@@ -1,0 +1,6 @@
+$kind: collection
+description: |-
+  Cinco ejercicios para practicar parámetros de ruta. Todas las peticiones fallan hasta que añadas las rutas en lecciones/l02_parametros_ruta.py. Resuélvelos en orden y vuelve a ejecutar la carpeta (Run folder) hasta verlo todo en verde.
+
+  Servidor: uvicorn l02_parametros_ruta:app --reload
+order: 2000
