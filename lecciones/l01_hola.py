@@ -37,6 +37,11 @@ def inicio():
 def estado():
     return {"servicio": "orderhub", "activo": True, "version": 1}
 
+# Una segunda ruta: cada función es un endpoint distinto.
+@app.get("/tienda")
+def tienda():
+    return {"Name": "My Store", "Currency": "PEN", "Active": True, "version": 1, "Message": "Welcome to My Store API"}
 
-# RETO: crea GET /tienda que devuelva el nombre de tu tienda y su moneda (por ejemplo, "PEN").
-# Luego búscala en /docs y pruébala con el botón "Try it out".
+@app.get("/tienda/estado")
+def tienda_estado():
+    return {"Active": True, "version": 1, "Message": "Welcome to My Store API Status"}
